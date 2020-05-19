@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, Button } from 'react-native';
 
 import FormRow from '../components/FormRow'
 
@@ -11,26 +11,16 @@ export default class LoginPage extends React.Component {
             password: '',
         }
     }
-    // onChangeMail(value){
-    //     this.setState({
-    //         email: value
-    //     })
-    // }
-    // onChangePasswd(value){
-    //     this.setState({
-    //         password: value
-    //     })
-    // }
     onChangeRender(field, value) {
-        // const newState = {};
-        // newState[field] = value;
-        // this.setState(newState);
         this.setState({ [field]: value })
+    }
+    tryLogin() {
+        console.log(this.state);
     }
     render(){
         return (
-            <View>
-                <FormRow>
+            <View style={styles.container}>
+                <FormRow first>
                     <TextInput 
                         style={styles.input}
                         placeholder='exemplo@user.com'
@@ -38,7 +28,7 @@ export default class LoginPage extends React.Component {
                         onChangeText={value => this.onChangeRender('email', value)}
                     />
                 </FormRow>
-                <FormRow>
+                <FormRow last>
                     <TextInput 
                         style={styles.input}
                         placeholder='******'
@@ -47,12 +37,20 @@ export default class LoginPage extends React.Component {
                        onChangeText={value => this.onChangeRender('password', value)}
                     />
                 </FormRow>
+                <Button 
+                    title="Entrar"
+                    onPress={() => this.tryLogin()}
+                />
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
+    container:{
+        paddingLeft: 10,
+        paddingRight: 10
+    },
     input:{
         paddingLeft: 5,
         paddingRight: 5,
