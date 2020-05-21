@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Button } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button, ActivityIndicator, Alert } from 'react-native';
+import firebase from 'firebase';
 
 import FormRow from '../components/FormRow'
 
@@ -9,13 +10,117 @@ export default class LoginPage extends React.Component {
         this.state = {
             email: '',
             password: '',
+            isLoading: false,
+            message:''
         }
     }
+
+    componentDidMount() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBELIBgs9AsgBi4GkxvKE7KCYVGYmYh3Hw",
+            authDomain: "series-77617.firebaseapp.com",
+            databaseURL: "https://series-77617.firebaseio.com",
+            projectId: "series-77617",
+            storageBucket: "series-77617.appspot.com",
+            messagingSenderId: "88368585313",
+            appId: "1:88368585313:web:c76271e63bd6ab0b03e820",
+            measurementId: "G-FPNXSBKQ6N"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+    }
+
     onChangeRender(field, value) {
         this.setState({ [field]: value })
     }
+
     tryLogin() {
-        console.log(this.state);
+        this.setState({ isLoading: true, message: ''})
+        const { email, password } = this.state;
+
+        const loginUserSuccess = user => {
+            this.setState({ message: 'Sucesso!' });
+            this.props.navigation.navigate('Main');
+        }
+
+        const loginUserFailed = error => {
+            this.setState({ 
+                message: this.getMessageByErrorCode(error.code)
+            });
+        }
+
+        firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then( loginUserSuccess )
+            .catch( error => {
+                if (error.code === 'auth/user-not-found') {
+                    Alert.alert(
+                        'Usuário não encontrado!',
+                        'Deseja criar um cadastro com as informações inseridas?',
+                        [{
+                            text: 'Não',
+                            onPress: () => {},
+                            style: 'cancel' //IOS
+                        },{
+                            text: 'Sim',
+                            onPress: () => {
+                                firebase
+                                    .auth()
+                                    .createUserWithEmailAndPassword(email, password)
+                                    .then( loginUserSuccess )
+                                    .catch( loginUserFailed )
+                            }
+                        }],
+                        { cancelable: false}
+                        ) 
+                } else {
+                    loginUserFailed
+                }
+            })
+            .then(() =>  this.setState({ isLoading: false}))
+    }
+
+    getMessageByErrorCode(errorCode) {
+        switch (errorCode) {
+            case 'auth/invalid-email':
+                return 'E-mail inválido!';
+                
+            case 'auth/user-not-found':
+                return 'Usuário não encontrado!';
+
+            case 'auth/wrong-password':
+                return 'Senha Inválida!';
+        
+            default:
+                return 'Erro Desconhecido!';
+        }
+
+    }
+
+    renderMessage() {
+        const { message } = this.state;
+        if (!message){
+            return null;
+        }
+        return(
+            <View>
+                <Text>{ message }</Text>
+            </View>
+        );
+    }
+
+    renderButton() {
+        if (this.state.isLoading){
+            return <ActivityIndicator />
+        }
+        return(
+            <Button 
+                    title="Entrar"
+                    onPress={() => this.tryLogin()}
+                />
+        )
     }
     render(){
         return (
@@ -37,10 +142,8 @@ export default class LoginPage extends React.Component {
                        onChangeText={value => this.onChangeRender('password', value)}
                     />
                 </FormRow>
-                <Button 
-                    title="Entrar"
-                    onPress={() => this.tryLogin()}
-                />
+                { this.renderButton() }
+                { this.renderMessage() }
             </View>
         )
     }
