@@ -70,13 +70,13 @@ export default class LoginPage extends React.Component {
                                     .auth()
                                     .createUserWithEmailAndPassword(email, password)
                                     .then( loginUserSuccess )
-                                    .catch( loginUserFailed )
+                                    .catch( loginUserFailed(error.code) )
                             }
                         }],
                         { cancelable: false}
                         ) 
                 } else {
-                    loginUserFailed
+                    loginUserFailed(error.code);
                 }
             })
             .then(() =>  this.setState({ isLoading: false}))
@@ -103,12 +103,22 @@ export default class LoginPage extends React.Component {
         const { message } = this.state;
         if (!message){
             return null;
+        } else {
+            console.log(message)
+            return(
+                Alert.alert(
+                    message,
+                    'Tente novamente!',
+                    [{
+                        text: 'Ok',
+                        onPress: () => {},
+                        style: 'cancel' //IOS
+                    }],
+                    { cancelable: false}
+                    ) 
+            );
         }
-        return(
-            <View>
-                <Text>{ message }</Text>
-            </View>
-        );
+        
     }
 
     renderButton() {
