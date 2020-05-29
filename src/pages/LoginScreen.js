@@ -1,10 +1,14 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, Button, ActivityIndicator, Alert } from 'react-native';
+
 import firebase from 'firebase';
+import { connect } from 'react-redux'
 
 import FormRow from '../components/FormRow'
 
-export default class LoginPage extends React.Component {
+import { tryLogin } from '../actions'
+
+class LoginPage extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -39,47 +43,24 @@ export default class LoginPage extends React.Component {
         this.setState({ isLoading: true, message: ''})
         const { email, password } = this.state;
 
-        const loginUserSuccess = user => {
-            this.setState({ message: 'Sucesso!' });
-            this.props.navigation.navigate('Main');
-        }
-
-        const loginUserFailed = error => {
-            this.setState({ 
-                message: this.getMessageByErrorCode(error.code)
-            });
-        }
-
-        firebase
-            .auth()
-            .signInWithEmailAndPassword(email, password)
-            .then( loginUserSuccess )
-            .catch( error => {
-                if (error.code === 'auth/user-not-found') {
-                    Alert.alert(
-                        'Usuário não encontrado!',
-                        'Deseja criar um cadastro com as informações inseridas?',
-                        [{
-                            text: 'Não',
-                            onPress: () => {},
-                            style: 'cancel' //IOS
-                        },{
-                            text: 'Sim',
-                            onPress: () => {
-                                firebase
-                                    .auth()
-                                    .createUserWithEmailAndPassword(email, password)
-                                    .then( loginUserSuccess )
-                                    .catch( loginUserFailed(error.code) )
-                            }
-                        }],
-                        { cancelable: false}
-                        ) 
-                } else {
-                    loginUserFailed(error.code);
+        this.props.tryLogin({ email, password })
+            .then( user => {
+                if (user) {
+                    this.props.navigation.replace('Main')
+                }
+                else {
+                    this.setState({
+                        isLoading: false,
+                        message: ''
+                    })
                 }
             })
-            .then(() =>  this.setState({ isLoading: false}))
+            .catch( error => {
+                this.setState({
+                    isLoading: false,
+                    message: this.getMessageByErrorCode(error.code)
+                })
+            })
     }
 
     getMessageByErrorCode(errorCode) {
@@ -141,6 +122,8 @@ export default class LoginPage extends React.Component {
                         placeholder='exemplo@user.com'
                         value={this.state.email}
                         onChangeText={value => this.onChangeRender('email', value)}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
                     />
                 </FormRow>
                 <FormRow last>
@@ -169,3 +152,13 @@ const styles = StyleSheet.create({
         paddingRight: 5,
     }
 })
+
+// const mapStateToProps = {
+
+// }
+
+const mapDispatchToProps = {
+    tryLogin
+}
+
+export default connect(null,mapDispatchToProps)(LoginPage)
