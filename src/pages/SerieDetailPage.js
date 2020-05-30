@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, Image, StyleSheet, Dimensions} from 'react-native';
+import Line from '../components/Line'
+import LongText from '../components/LongText'
 
 export default class SerieDetailPage extends React.Component {
     render() {
@@ -14,7 +16,7 @@ export default class SerieDetailPage extends React.Component {
                 "Everybody Hates Chris (Todo Mundo Odeia o Chris (título no Brasil) ou Todos Contra o Chris (título em Portugal)) é uma série de televisão estadunidense de comédia dramática inspirado nas experiências pessoais de Chris Rock no bairro de Bed-Stuy, em Nova Iorque, seguindo um estilo muito parecido com a série Anos Incríveis."
         }
         return (
-            <View>
+            <ScrollView>
                 <Image
                     style={styles.image}
                     source={{
@@ -22,14 +24,18 @@ export default class SerieDetailPage extends React.Component {
                     }}
                 />
                 {/* <Text>{this.props.navigation.state.params.serie.title}</Text> */}
-                <Text>{serie.title}</Text>
-            </View>
+                    <Line label="Titullo" content={serie.title}/>
+                    <Line label="Genero" content={serie.gender}/>
+                    <Line label="Nota" content={serie.rate}/>
+                    <LongText label="Descrição" content={serie.description}/>
+            </ScrollView>
         );
     }
 }
 
 const styles = StyleSheet.create({
     image:{
-        aspectRatio: 1
+        aspectRatio: 1,
+        resizeMode: "contain"
     }
 })
