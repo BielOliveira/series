@@ -6,7 +6,7 @@ export default class SerieDetailPage extends React.Component {
     render() {
         return (
             <View>
-                <Text>Esta é a pagina de detalhes</Text>
+                <Text>{this.props.navigation.state.params.serie.title}</Text>
             </View>
         );
     }
