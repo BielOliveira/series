@@ -3,17 +3,24 @@ import {createStackNavigator, HeaderTitle} from 'react-navigation-stack';
 
 import LoginScreen from './pages/LoginScreen'
 import SeriesPage from './pages/SeriesPage';
+import SerieDetailPage from './pages/SerieDetailPage';
 
 const AppNavigator = createStackNavigator({
+  'Main': {
+    screen: SeriesPage
+  },
   'Login':{
     screen: LoginScreen,
     navigationOptions: {
       title: 'Bem Vindo!'
     }
   },
-  'Main': {
-    screen: SeriesPage
-  }
+  'SerieDetail':{
+    screen: SerieDetailPage,
+    navigationOptions: {
+      title: 'Página de Detalhes'
+    }
+  },
 }, {
   defaultNavigationOptions: {
     title: "Series",
